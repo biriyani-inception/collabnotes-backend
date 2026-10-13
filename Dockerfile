@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1
-# Two-stage build: Maven resolves deps in stage 1, then we ship a slim JRE-only runtime.
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
@@ -12,4 +11,4 @@ WORKDIR /app
 COPY --from=build /app/target/collabnotes.jar /app/collabnotes.jar
 EXPOSE 10000
 ENV PORT=10000
-CMD ["java", "-jar", "/app/collabnotes.jar"]
+ENTRYPOINT ["sh","-c","if [ -n \"$DB_HOST\" ]; then export SPRING_DATASOURCE_URL=\"jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME\"; export SPRING_DATASOURCE_DRIVER=org.postgresql.Driver; fi; exec java -jar /app/collabnotes.jar"]
