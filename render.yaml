@@ -1,4 +1,4 @@
-# Render Blueprint: Spring Boot API + managed PostgreSQL.
+# Render Blueprint: Spring Boot API and PostgreSQL.
 databases:
   - name: collabnotes-db
     databaseName: collabnotes
@@ -18,12 +18,18 @@ services:
         value: "86400000"
       - key: APP_CORS_ALLOWED_ORIGINS
         value: "*"
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_HOST
         fromDatabase:
           name: collabnotes-db
-          property: connectionString
-      - key: SPRING_DATASOURCE_DRIVER
-        value: org.postgresql.Driver
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: collabnotes-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: collabnotes-db
+          property: database
       - key: DB_USER
         fromDatabase:
           name: collabnotes-db
