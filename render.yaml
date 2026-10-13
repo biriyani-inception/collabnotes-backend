@@ -1,17 +1,34 @@
-# Render (https://render.com) — single service, free tier, Java + WebSockets.
-# Set APP_JWT_SECRET and APP_CORS_ALLOWED_ORIGINS in the Render dashboard.
+# Render Blueprint: Spring Boot API + managed PostgreSQL.
+databases:
+  - name: collabnotes-db
+    databaseName: collabnotes
+    user: collabnotes
+    plan: free
 
 services:
   - type: web
     name: collabnotes-backend
-    env: java
+    runtime: docker
     plan: free
-    buildCommand: mvn -B -DskipTests package
-    startCommand: java -jar target/collabnotes.jar
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_JWT_SECRET
         generateValue: true
+      - key: APP_JWT_EXPIRATION_MS
+        value: "86400000"
       - key: APP_CORS_ALLOWED_ORIGINS
         value: "*"
-      - key: APP_JWT_EXPIRATION_MS
-        value: 86400000
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: collabnotes-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_DRIVER
+        value: org.postgresql.Driver
+      - key: DB_USER
+        fromDatabase:
+          name: collabnotes-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: collabnotes-db
+          property: password
